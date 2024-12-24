@@ -547,16 +547,16 @@ class PatchCore(torch.nn.Module):
             pmae_feature_interpolation.append(cp.asnumpy((x2*x3*cp.asarray(a1_temp)+x1*x3*cp.asarray(a2_temp)+x1*x2*cp.asarray(a3_temp))/(x1*x2+x1*x3+x2*x3)))
         pmae_feature_interpolation=np.array(pmae_feature_interpolation).swapaxes(0,1)
         return pmae_feature_interpolation
-    def compute_masks_pmae(self,memory_feature_pmae,indices,distance_pmae,indices_pmae):
-        x1=distance_pmae[:,0]#.reshape((len(distance_pmae[:,0]),1))
-        x2=distance_pmae[:,1]#.reshape((len(distance_pmae[:,0]),1))
-        x3=distance_pmae[:,2]#.reshape((len(distance_pmae[:,0]),1))
+    def compute_masks_pmae(self,memory_feature_pmae,indices,pmae_features,indices_pmae):
+        # x1=distance_pmae[:,0]#.reshape((len(distance_pmae[:,0]),1))
+        # x2=distance_pmae[:,1]#.reshape((len(distance_pmae[:,0]),1))
+        # x3=distance_pmae[:,2]#.reshape((len(distance_pmae[:,0]),1))
         # a1=memory_feature_pmae[indices_pmae[:,0],:]#np.swapaxes(,0,1)
         # a2=memory_feature_pmae[indices_pmae[:,1],:]#np.swapaxes(,0,1)
         # a3=memory_feature_pmae[indices_pmae[:,2],:]#np.swapaxes(,0,1)
         distance_pmae_des=[]
         for index in np.array_split(np.arange(len(indices)),3):
-            pmae_feature_interpolation=memory_feature_pmae[indices_pmae[index,0],:]
+            pmae_feature_interpolation=pmae_features[indices_pmae[index,0],:]
         #     #pmae_feature_interpolation=self.interpolation_pmae(x1[index],x2[index],x3[index],a1[:,index],a2[:,index],a3[:,index])
         # #pmae_feature_interpolation=self.interpolation_pmae(x1,x2,x3,a1,a2,a3)#(x2*x3*a1+x1*x3*a2+x1*x2*a3)/(x1*x2+x1*x3+x2*x3)
         # #pmae_feature_interpolation=pmae_feature_interpolation
@@ -607,7 +607,7 @@ class PatchCore(torch.nn.Module):
         _masks_xyz=distances[:,0]
         _scores_xyz=np.max(_masks_xyz)
         #_masks_pmae=np.sqrt(np.sum((pmae_features[indices_pmae,:] - memory_feature_pmae[indices[:,0]])**2,axis=1))
-        _masks_pmae=self.compute_masks_pmae(memory_feature_pmae,indices,distances_pmae,indices_pmae)
+        _masks_pmae=self.compute_masks_pmae(memory_feature_pmae,indices,pmae_features,indices_pmae)
         _scores_pmae=np.max(_masks_pmae)
         return _scores_xyz, _masks_xyz,_scores_pmae, _masks_pmae
     def predict_myself(self,test_loader,memory_feature_xyz,memory_feature_pmae):

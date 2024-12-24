@@ -25,7 +25,12 @@ from scipy.stats import rankdata
 import argparse
 import pandas as pd
 LOGGER = logging.getLogger(__name__)
-
+import debugpy
+#保证host和端口一致，listen可以只设置端口。则为localhost,否则设置成(host,port)
+debugpy.listen(12361)
+print('wait debugger')
+debugpy.wait_for_client()
+print("Debugger Attached")
 
 @click.group(chain=True)
 @click.option("--gpu", type=int, default=[0], multiple=True, show_default=True)
@@ -62,16 +67,20 @@ def run(
     )
 
     result_collect = []
-    root_dir = './data'
+    root_dir = '/data02/zbz/point_anomaly/PointCore/dataset/pcd'
     save_root_dir = './benchmark/reg3dad/'
     print('Task start: Reg3DAD')
     
-    real_3d_classes = ['airplane','car','candybar','chicken',
-                    'diamond','duck','fish','gemstone',
-                    'seahorse','shell','starfish','toffees']#'airplane','car','candybar','chicken',
+    # real_3d_classes = ['airplane','car','candybar','chicken',
+    #                 'diamond','duck','fish','gemstone',
+    #                 'seahorse','shell','starfish','toffees']#'airplane','car','candybar','chicken',
                     #'diamond','duck','fish','gemstone',
                     #'seahorse','shell','starfish','toffees'
-    dict_name_index={"airplane":0,"car":1,"candybar":2,"chicken":3,"diamond":4,"duck":5,"fish":6,"gemstone":7,"seahorse":8,"shell":9,"starfish":10,"toffees":11}
+    #根据root_dir下所有文件夹的名字组成一个real_3d_classes
+    real_3d_classes = os.listdir(root_dir)
+    
+    #dict_name_index={"airplane":0,"car":1,"candybar":2,"chicken":3,"diamond":4,"duck":5,"fish":6,"gemstone":7,"seahorse":8,"shell":9,"starfish":10,"toffees":11}
+    dict_name_index = {class_name: index for index, class_name in enumerate(real_3d_classes)}
     data_save={}
     downsample_list = ["_01","_008","_006"]
     for item in real_3d_classes:
@@ -169,7 +178,7 @@ def run(
             print('Task:{}, image_auc:{}, pixel_auc:{}, image_ap:{}, pixel_ap:{}, time_cost:{}'.format
                     (dataset_name,auroc,full_pixel_auroc,img_ap,pixel_ap,time_cost))
             from evaluation import evaluation_pmae_fpfh_xyz
-            img_ap_old,full_image_auroc_old = evaluation_pmae_fpfh_xyz(real_3d_classes_index=dict_name_index[dataset_name],a_a=1,b_b=0.26,index_print=0)
+            img_ap_old,full_image_auroc_old = evaluation_pmae_fpfh_xyz(real_3d_classes=real_3d_classes,real_3d_classes_index=dict_name_index[dataset_name],a_a=1,b_b=0.26,index_print=0)
             if(img_ap_old<img_ap and full_image_auroc_old<auroc):
                 with open("data_save_scores_myself/"+dataset_name+"scores_xyz"+'.pkl','wb') as f:
                     pickle.dump(scores_xyz,f)
