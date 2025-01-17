@@ -19,7 +19,7 @@ To install the requirements, please refer to [requirements](https://github.com/M
 
 ### Checkpoint preparation
 
-We have prepared all the checkpoints needed and provided a [onedrive download link](https://mailscuteducn-my.sharepoint.com/:u:/g/personal/201966176253_mail_scut_edu_cn/EZeCKF64rc5DoX6HdfVELr0B_PLIKSn4WXBfYyg6nkywqg?e=YbnlHP)
+We have prepared all the checkpoints needed and provided a [Google drive download link](https://drive.google.com/file/d/1HvT0Z3022jNUbSwQezy11CvUFLcMdluY/view?usp=drive_link)
 
 Download checkpoints.zip and extract into ./checkpoints/
 
